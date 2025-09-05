@@ -65,11 +65,6 @@ server {
   # ⚠️ Custom error pages for server errors
   error_page 500 502 503 504 /50x.html;
 
-  location = /50x.html {
-      root {{root}};
-      internal;
-  }
-
   try_files $uri $uri/ /index.php?$args;
   index index.php index.html;
 
