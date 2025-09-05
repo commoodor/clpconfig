@@ -72,6 +72,7 @@ server {
     include fastcgi_params;
     fastcgi_intercept_errors on;
     fastcgi_index index.php;
+    # Add Line
     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
     try_files $uri =404;
     fastcgi_read_timeout 3600;
