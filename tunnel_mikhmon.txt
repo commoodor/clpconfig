@@ -1,5 +1,5 @@
 # {"rootDirectory":"","phpVersion":"8.1"}
-# Rate limiting config (global, taruh di http{} block)
+# Rate limiting config (taruh di http{} block)
 limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
 
 server {
@@ -47,6 +47,22 @@ server {
   location ~* /(template(-small|-thermal)?|default(-small|-thermal)?)\.php$ {
       deny all;
       return 403;
+  }
+
+  # 🔁 Redirect 403 & 404 → homepage
+  error_page 403 = @redirect_home;
+  error_page 404 = @redirect_home;
+
+  location @redirect_home {
+      return 302 /;
+  }
+
+  # ⚠️ Custom error pages for server errors
+  error_page 500 502 503 504 /50x.html;
+
+  location = /50x.html {
+      root {{root}};   # ganti sesuai lokasi static HTML error page
+      internal;
   }
 
   try_files $uri $uri/ /index.php?$args;
