@@ -43,12 +43,6 @@ server {
       return 200 "User-agent: *\nDisallow: /\n";
   }
 
-  # 🚫 Block sensitive voucher template files
-  location ~* /(template(-small|-thermal)?|default(-small|-thermal)?)\.php$ {
-      deny all;
-      return 403;
-  }
-
   # 🔁 Redirect 403 & 404 → homepage
   error_page 403 = @redirect_home;
   error_page 404 = @redirect_home;
