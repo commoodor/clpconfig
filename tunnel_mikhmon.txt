@@ -1,4 +1,7 @@
 # {"rootDirectory":"","phpVersion":"8.1"}
+# Rate limiting config (global, taruh di http{} block)
+limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
+
 server {
   listen 80;
   listen 443 ssl;
@@ -33,6 +36,18 @@ server {
 
   # 🚫 Enable rate limit (apply to all requests)
   limit_req zone=one burst=5 nodelay;
+
+  # 🚫 Anti-crawler & subdomain finder
+  location = /robots.txt {
+      add_header Content-Type text/plain;
+      return 200 "User-agent: *\nDisallow: /\n";
+  }
+
+  # 🚫 Block sensitive voucher template files
+  location ~* /(template(-small|-thermal)?|default(-small|-thermal)?)\.php$ {
+      deny all;
+      return 403;
+  }
 
   try_files $uri $uri/ /index.php?$args;
   index index.php index.html;
