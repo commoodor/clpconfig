@@ -19,9 +19,14 @@ server {
   #  rewrite ^ https://$host$uri permanent;
   #}
 
-  location ~ /.well-known {
-    auth_basic off;
-    allow all;
+  #location ~ /.well-known {
+  #  auth_basic off;
+  #  allow all;
+  #}
+  
+  location ~ ^/.well-known/ {
+    deny all;
+    return 403;
   }
 
   {{settings}}
