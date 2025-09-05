@@ -1,0 +1,89 @@
+# {"rootDirectory":"","phpVersion":"8.1"}
+
+server {
+  listen 80;
+  listen 443 ssl;
+  http2 on;
+
+  {{ssl_certificate_key}}
+  {{ssl_certificate}}
+  {{server_name}}
+  {{root}}
+
+  {{nginx_access_log}}
+  {{nginx_error_log}}
+
+  #if ($scheme != "https") {
+  #  rewrite ^ https://$host$uri permanent;
+  #}
+
+  #location ~ /.well-known {
+  #  auth_basic off;
+  #  allow all;
+  #}
+  
+  location ~ ^/.well-known/ {
+    deny all;
+    return 403;
+  }
+
+  {{settings}}
+
+  # 🚫 Prevent indexing by crawlers / search engines
+  add_header X-Robots-Tag "noindex, nofollow" always;
+
+  # 🚫 Block common subdomain scanners / crawlers
+  if ($http_user_agent ~* (amass|sublist3r|dirbuster|nmap|httpx|curl|masscan)) {
+    return 403;
+  }
+
+  # 🚫 Anti-crawler & subdomain finder
+  location = /robots.txt {
+      add_header Content-Type text/plain;
+      return 200 "User-agent: *\nDisallow: /\n";
+  }
+
+  # 🚫 Block sensitive voucher template files
+  location ~* /(template(-small|-thermal)?|default(-small|-thermal)?)\.php$ {
+      deny all;
+      return 403;
+  }
+
+  # 🔁 Redirect 403 & 404 → homepage
+  error_page 403 = @redirect_home;
+  error_page 404 = @redirect_home;
+
+  location @redirect_home {
+      return 302 /;
+  }
+
+  # ⚠️ Custom error pages for server errors
+  error_page 500 502 503 504 /50x.html;
+
+  try_files $uri $uri/ /index.php?$args;
+  index index.php index.html;
+
+  location ~ \.php$ {
+    include fastcgi_params;
+    fastcgi_intercept_errors on;
+    fastcgi_index index.php;
+    # Add Line
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    try_files $uri =404;
+    fastcgi_read_timeout 3600;
+    fastcgi_send_timeout 3600;
+    fastcgi_param HTTPS $fastcgi_https;
+    fastcgi_pass 127.0.0.1:{{php_fpm_port}};
+    fastcgi_param PHP_VALUE "{{php_settings}}";
+  }
+
+  location ~* ^.+\.(css|js|jpg|jpeg|gif|png|ico|gz|svg|svgz|ttf|otf|woff|woff2|eot|mp4|ogg|ogv|webm|webp|zip|swf)$ {
+    add_header Access-Control-Allow-Origin "*";
+    expires max;
+    access_log off;
+  }
+
+  if (-f $request_filename) {
+    break;
+  }
+}
