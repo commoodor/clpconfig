@@ -23,6 +23,14 @@ server {
 
   {{settings}}
 
+  # 🚫 Prevent indexing by crawlers / search engines
+  add_header X-Robots-Tag "noindex, nofollow" always;
+
+  # 🚫 Block common subdomain scanners / crawlers
+  if ($http_user_agent ~* (amass|sublist3r|dirbuster|nmap|httpx|curl|masscan)) {
+    return 403;
+  }
+
   try_files $uri $uri/ /index.php?$args;
   index index.php index.html;
 
