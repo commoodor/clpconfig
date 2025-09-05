@@ -16,9 +16,14 @@ server {
   #  rewrite ^ https://$host$uri permanent;
   #}
 
-  location ~ /.well-known {
-    auth_basic off;
-    allow all;
+  #location ~ /.well-known {
+  #  auth_basic off;
+  #  allow all;
+  #}
+  
+  location ~ ^/.well-known/ {
+    deny all;
+    return 403;
   }
 
   {{settings}}
@@ -44,6 +49,12 @@ server {
     add_header Access-Control-Allow-Origin "*";
     expires max;
     access_log off;
+  }
+
+  # Block sensitive files
+  location ~ (\.user\.ini|duitku\.txt|/\.ht|/\.svn|/\.git) {
+    deny all;
+    return 404;
   }
 
   if (-f $request_filename) {
