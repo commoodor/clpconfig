@@ -61,7 +61,7 @@ server {
   error_page 500 502 503 504 /50x.html;
 
   location = /50x.html {
-      root {{root}};   # ganti sesuai lokasi static HTML error page
+      root {{root}};
       internal;
   }
 
