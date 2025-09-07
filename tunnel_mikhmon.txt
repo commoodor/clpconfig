@@ -1,6 +1,6 @@
 # {"rootDirectory":"","phpVersion":"8.1"}
 # Rate limiting config (taruh di http{} block)
-limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
+#limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
 
 server {
   listen 80;
@@ -40,7 +40,7 @@ server {
   }
 
   # 🚫 Enable rate limit (apply to all requests)
-  limit_req zone=one burst=5 nodelay;
+  #limit_req zone=one burst=5 nodelay;
 
   # 🚫 Anti-crawler & subdomain finder
   location = /robots.txt {
