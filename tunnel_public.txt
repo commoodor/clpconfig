@@ -7,6 +7,7 @@ server {
   {{ssl_certificate_key}}
   {{ssl_certificate}}
   {{server_name}}
+  include /etc/nginx/conf.d/cloudflare-realip.conf;
   {{root}}
 
   {{nginx_access_log}}
